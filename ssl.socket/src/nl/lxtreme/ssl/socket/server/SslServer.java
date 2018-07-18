@@ -18,19 +18,19 @@ import nl.lxtreme.ssl.socket.SslContextProvider;
 public class SslServer implements SslContextProvider {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            System.out.println("Usage: SslServer <port>\n");
-            System.exit(1);
-        }
+//        if (args.length != 1) {
+//            System.out.println("Usage: SslServer <port>\n");
+//            System.exit(1);
+//        }
 
-        int port = Integer.parseInt(args[0]);
+        int port = Integer.parseInt("9000");
 
         new SslServer().run(port);
     }
 
     @Override
     public KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
-        return createKeyManagers("server.jks", "geheim".toCharArray());
+        return createKeyManagers("/Users/kabiruahmed/Documents/java-project/ssl-socket-demo/sslcert/server.jks", "kamok12345".toCharArray());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SslServer implements SslContextProvider {
 
     @Override
     public TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException {
-        return createTrustManagers("../cacert.jks", "geheim".toCharArray());
+        return createTrustManagers("/Users/kabiruahmed/Documents/java-project/ssl-socket-demo/sslcert/cacert.jks", "kamok12345".toCharArray());
     }
 
     public void run(int port) throws Exception {

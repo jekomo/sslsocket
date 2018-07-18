@@ -13,24 +13,26 @@ import javax.net.ssl.TrustManager;
 
 import nl.lxtreme.ssl.socket.SslContextProvider;
 import nl.lxtreme.ssl.socket.SslUtil;
+import org.jpos.iso.ISOMsg;
+import org.jpos.iso.packager.GenericPackager;
 
 public class SslClient implements SslContextProvider {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 2) {
-            System.out.println("Usage: SslClient <host> <port>\n");
-            System.exit(1);
-        }
+//        if (args.length != 2) {
+//            System.out.println("Usage: SslClient <host> <port>\n");
+//            System.exit(1);
+//        }
 
-        String host = args[0];
-        int port = Integer.parseInt(args[1]);
+        String host = "196.6.103.73";
+        int port = Integer.parseInt("5043");
 
         new SslClient().run(host, port);
     }
 
     @Override
     public KeyManager[] getKeyManagers() throws GeneralSecurityException, IOException {
-        return createKeyManagers("client.jks", "geheim".toCharArray());
+        return createKeyManagers("/Users/kabiruahmed/Documents/java-project/ssl-socket-demo/sslcert/keystore.jks", "changeit".toCharArray());
     }
 
     @Override
@@ -40,31 +42,53 @@ public class SslClient implements SslContextProvider {
 
     @Override
     public TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException {
-        return createTrustManagers("../cacert.jks", "geheim".toCharArray());
+        return createTrustManagers("jssecacerts", "changeit".toCharArray());
     }
 
     public void run(String host, int port) throws Exception {
         try (SSLSocket socket = createSSLSocket(host, port); OutputStream os = socket.getOutputStream(); InputStream is = socket.getInputStream()) {
 
+            System.out.println(socket.isConnected());
             System.out.printf("Connected to server (%s). Writing ping...%n", getPeerIdentity(socket));
+            GenericPackager packager = new GenericPackager("basic.xml");
 
-            os.write("ping".getBytes());
-            os.flush();
+            // Create ISO Message
+            ISOMsg isoMsg = new ISOMsg();
+            isoMsg.setPackager(packager);
+            isoMsg.setMTI("0200");
+            isoMsg.set(3, "201234");
+            isoMsg.set(4, "10000");
+            isoMsg.set(7, "110722180");
+            isoMsg.set(11, "123456");
+            isoMsg.set(44, "A5DFGR");
+            isoMsg.set(105, "ABCDEFGHIJ 1234567890");
 
-            System.out.println("Ping written, awaiting pong...");
+            // print the DE list
+            //logISOMsg(isoMsg);
 
-            byte[] buf = new byte[4];
-            int read = is.read(buf);
-            if (read != 4) {
-                throw new RuntimeException("Not enough bytes read: " + read + ", expected 4 bytes!");
-            }
+            // Get and print the output result
+            byte[] data = isoMsg.pack();
+            System.out.println("RESULT : " + new String(data));
 
-            String response = new String(buf);
-            if (!"pong".equals(response)) {
-                throw new RuntimeException("Expected 'pong', but got '" + response + "'...");
-            }
+            os.write(data);
 
-            System.out.println("Pong obtained! Ending client...");
+//            os.write("ping".getBytes());
+//            os.flush();
+//
+//            System.out.println("Ping written, awaiting pong...");
+//
+//            byte[] buf = new byte[4];
+//            int read = is.read(buf);
+//            if (read != 4) {
+//                throw new RuntimeException("Not enough bytes read: " + read + ", expected 4 bytes!");
+//            }
+//
+//            String response = new String(buf);
+//            if (!"pong".equals(response)) {
+//                throw new RuntimeException("Expected 'pong', but got '" + response + "'...");
+//            }
+//
+//            System.out.println("Pong obtained! Ending client...");
         }
     }
 
