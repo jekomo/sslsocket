@@ -2,9 +2,7 @@ package nl.lxtreme.ssl.socket.client;
 
 import static nl.lxtreme.ssl.socket.SslUtil.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.GeneralSecurityException;
 
 import javax.net.ssl.KeyManager;
@@ -24,8 +22,8 @@ public class SslClient implements SslContextProvider {
 //            System.exit(1);
 //        }
 
-        String host = "196.6.103.73";
-        int port = Integer.parseInt("5043");
+//        String host = "196.6.103.73";
+//        int port = Integer.parseInt("5043");
 
         new SslClient().run(host, port);
     }
@@ -47,6 +45,7 @@ public class SslClient implements SslContextProvider {
 
     public void run(String host, int port) throws Exception {
         try (SSLSocket socket = createSSLSocket(host, port); OutputStream os = socket.getOutputStream(); InputStream is = socket.getInputStream()) {
+            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             System.out.println(socket.isConnected());
             System.out.printf("Connected to server (%s). Writing ping...%n", getPeerIdentity(socket));
@@ -69,8 +68,15 @@ public class SslClient implements SslContextProvider {
             // Get and print the output result
             byte[] data = isoMsg.pack();
             System.out.println("RESULT : " + new String(data));
+            String msg = "0420F23C46D129E08100000000420000002116496009181214700600000000000000020007181524171707861523380718200852510510000012D0000000006111130374960091812147006D200822611376712000002018071803382262070AL30FBP204011021396GLOBAL ACCELEREX LIM   LA           LANG5660044021020017078607181523380000011112900000000000000000000200000000000000D00000000D0000000001551110151334410178E83D9FD0DB5D6859C953AF1506DCDF9E60F1592479A6D34026917A3AF3F3E2";
+            DataOutputStream dout=new DataOutputStream(socket.getOutputStream());
+            dout.writeUTF(msg);
+            dout.flush();
+            //os.write(msg.getBytes());
 
-            os.write(data);
+            String modifiedSentence = inFromServer.readLine();
+            System.out.println(modifiedSentence);
+           // String s = is.read();
 
 //            os.write("ping".getBytes());
 //            os.flush();
