@@ -78,8 +78,4 @@ Both the client and server terminate after this.
 
 This code is licensed under Apache-2.0 License.
 
-## Author
-
-This code is written by Jan Willem Janssen, j.w.janssen@lxtreme.nl.
-
 
