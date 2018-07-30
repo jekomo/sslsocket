@@ -2,9 +2,6 @@
 
 This demo project shows how to create and set up two-way authenticated SSL
 communication over raw sockets using plain Java (and OpenSSL).
-
-The idea for this is based on the following blog posting: 
-http://thoughtcrime.org/blog/authenticity-is-broken-in-ssl-but-your-app-ha/
 (option 1) which basically explains the following set up:
 
 1. A private (self-signed) CA is used to create a 4096-bit signing certificate;
